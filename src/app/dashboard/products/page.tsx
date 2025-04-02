@@ -12,6 +12,11 @@ import {
 } from "@/components/ui/table";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
+import { Dialog } from "@headlessui/react"; // Import Dialog from Headless UI
+import { Label } from "@/components/ui/label"; // For label inputs
+import { Textarea } from "@/components/ui/textarea"; // For text inputs
+import AddProductModal from "./modal";
+import { toast } from "sonner";
 
 const ProductPage = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -19,7 +24,9 @@ const ProductPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 
+  // Fetch products data
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -47,6 +54,14 @@ const ProductPage = () => {
     }
   };
 
+  const handleProductAdded = () => {
+    setIsModalOpen(false);
+    toast.success("Sản phẩm đã được thêm thành công!", {
+      icon: <span className="text-green-500">✔</span>,
+    });
+    setCurrentPage(1); // Đặt lại trang về đầu tiên
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -59,7 +74,10 @@ const ProductPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button className="bg-blue-500 text-white py-2 px-4 rounded-lg">
+        <Button
+          className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+          onClick={() => setIsModalOpen(true)} // Open modal on click
+        >
           Add New Product
         </Button>
       </div>
@@ -129,6 +147,12 @@ const ProductPage = () => {
           Next
         </Button>
       </div>
+
+      <AddProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onProductAdded={handleProductAdded}
+      />
     </div>
   );
 };

@@ -194,7 +194,7 @@ const CategoriesPage = () => {
                 <Button
                   variant="outline"
                   className="mr-2"
-                  onClick={() => openEditModal(category)} // Mở modal chỉnh sửa
+                  onClick={() => openEditModal(category)}
                 >
                   Edit
                 </Button>

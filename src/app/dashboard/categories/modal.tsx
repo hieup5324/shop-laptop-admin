@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { toast } from "sonner"; // Import hàm toast để hiển thị thông báo
+import { toast } from "sonner";
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -32,10 +32,6 @@ const AddCategoryModal = ({
 
       onCategoryAdded(response.data);
       onClose();
-
-      toast.success("Danh mục đã được thêm thành công!", {
-        icon: <span className="text-green-500">✔</span>,
-      });
       setNewCategory({ name: "", description: "" });
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
