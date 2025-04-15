@@ -14,33 +14,36 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { Input } from "@/components/ui/input";
 import React from "react";
-import { toast } from "sonner";
 
-const UsersPage = () => {
+const OrdersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/users", {
-        params: {
-          page: currentPage,
-          page_size: pageSize,
-          search: searchTerm,
-        },
-      });
-
-      setUsers(response.data.data);
-      setTotalPages(response.data.paging.totalPages);
-    } catch (error) {
-      console.error("Error fetching users", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:3001/order/test", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page: currentPage,
+            page_size: pageSize,
+            search: searchTerm,
+          },
+        });
+
+        setUsers(response.data.data);
+        setTotalPages(response.data.paging.totalPages);
+      } catch (error) {
+        console.error("Error fetching users", error);
+      }
+    };
+
     fetchUsers();
   }, [currentPage, pageSize, searchTerm]);
 
@@ -50,35 +53,17 @@ const UsersPage = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3001/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success("User deleted successfully");
-      fetchUsers();
-    } catch (error) {
-      console.error("Error deleting user", error);
-      toast.error("Failed to delete user");
-    }
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-4">
-          <div className="flex flex-col">
-            <Input
-              type="text"
-              placeholder="Tìm kiếm người dùng"
-              className="p-2 border rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div>
+          <Input
+            type="text"
+            placeholder="Search for a user"
+            className="p-2 border rounded-lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         {/* <Button className="bg-blue-500 text-white py-2 px-4 rounded-lg">
           Add New
@@ -89,10 +74,11 @@ const UsersPage = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="p-2">#</TableHead>
-            <TableHead className="p-2">Name</TableHead>
-            <TableHead className="p-2">Email</TableHead>
             <TableHead className="p-2">Created At</TableHead>
-            <TableHead className="p-2">Role</TableHead>
+            <TableHead className="p-2">Order Code</TableHead>
+            <TableHead className="p-2">Payment Type</TableHead>
+            <TableHead className="p-2">Status Payment</TableHead>
+            <TableHead className="p-2">Status</TableHead>
             <TableHead className="p-2">Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -104,20 +90,17 @@ const UsersPage = () => {
                 {(currentPage - 1) * pageSize + index + 1}
               </TableCell>
               <TableCell className="p-2">
-                {user.first_name} {user.last_name}
-              </TableCell>
-              <TableCell className="p-2">{user.email}</TableCell>
-              <TableCell className="p-2">
                 {dayjs(user.createdAt).format("DD/MM/YYYY")}
               </TableCell>
-              <TableCell className="p-2">{user.role}</TableCell>
+              <TableCell className="p-2">{user.order_code}</TableCell>
+              <TableCell className="p-2">{user.payment_type}</TableCell>
+              <TableCell className="p-2">{user.status_payment}</TableCell>
+              <TableCell className="p-2">{user.status}</TableCell>
               <TableCell className="p-2">
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDeleteUser(user.id)}
-                >
-                  Delete
+                <Button variant="outline" className="mr-2">
+                  View
                 </Button>
+                <Button variant="destructive">Delete</Button>
               </TableCell>
             </TableRow>
           ))}
@@ -128,7 +111,7 @@ const UsersPage = () => {
       <div className="flex justify-between items-center mt-4">
         <Button
           variant="outline"
-          className="mr-4 border-black"
+          className="mr-4"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -137,13 +120,11 @@ const UsersPage = () => {
         <div className="flex gap-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .filter((page) => {
-              // Hiển thị trang đầu tiên, cuối cùng, và các trang xung quanh trang hiện tại
               if (page === 1 || page === totalPages) return true;
               if (Math.abs(page - currentPage) <= 2) return true;
               return false;
             })
             .map((page, index, array) => {
-              // Thêm dấu "..." giữa các khoảng trống
               if (index > 0 && page - array[index - 1] > 1) {
                 return (
                   <React.Fragment key={`ellipsis-${page}`}>
@@ -151,10 +132,8 @@ const UsersPage = () => {
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
-                      className={`w-10 h-10 ${
-                        currentPage === page ? "" : "border-black"
-                      }`}
                       onClick={() => handlePageChange(page)}
+                      className="w-10 h-10"
                     >
                       {page}
                     </Button>
@@ -165,10 +144,8 @@ const UsersPage = () => {
                 <Button
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
-                  className={`w-10 h-10 ${
-                    currentPage === page ? "" : "border-black"
-                  }`}
                   onClick={() => handlePageChange(page)}
+                  className="w-10 h-10"
                 >
                   {page}
                 </Button>
@@ -177,7 +154,6 @@ const UsersPage = () => {
         </div>
         <Button
           variant="outline"
-          className="border-black"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
@@ -188,4 +164,4 @@ const UsersPage = () => {
   );
 };
 
-export default UsersPage;
+export default OrdersPage;

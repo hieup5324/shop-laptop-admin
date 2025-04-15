@@ -47,7 +47,7 @@ const AddCategoryModal = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-lg w-1/3">
+      <div className="bg-white p-6 rounded-lg w-1/3 border border-gray-300">
         <h2 className="text-xl mb-4">Thêm danh mục mới</h2>
         <div className="mb-4">
           <input

@@ -15,23 +15,21 @@ import AddCategoryModal from "./modal";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import React from "react";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  // State để quản lý trang và số lượng trang
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // State cho modal confirm xóa
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
-  // State cho modal chỉnh sửa
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<any | null>(null);
 
@@ -213,19 +211,52 @@ const CategoriesPage = () => {
       <div className="flex justify-between items-center mt-4">
         <Button
           variant="outline"
-          className="mr-4"
+          className="mr-4 border-black"
           onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
         >
           Previous
         </Button>
-        <div>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
+        <div className="flex gap-2">
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((page) => {
+              if (page === 1 || page === totalPages) return true;
+              if (Math.abs(page - currentPage) <= 2) return true;
+              return false;
+            })
+            .map((page, index, array) => {
+              if (index > 0 && page - array[index - 1] > 1) {
+                return (
+                  <React.Fragment key={`ellipsis-${page}`}>
+                    <span className="px-2">...</span>
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                      onClick={() => handlePageChange(page)}
+                    >
+                      {page}
+                    </Button>
+                  </React.Fragment>
+                );
+              }
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </Button>
+              );
+            })}
         </div>
         <Button
           variant="outline"
+          className="border-black"
           onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
         >
           Next
         </Button>
@@ -234,7 +265,7 @@ const CategoriesPage = () => {
       {/* Modal Xác Nhận Xóa */}
       {isConfirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg w-1/3 border border-gray-300">
             <h3 className="text-lg font-semibold">Confirm Delete</h3>
             <p>Are you sure you want to delete this category?</p>
             <div className="mt-4 flex justify-end">
@@ -256,7 +287,7 @@ const CategoriesPage = () => {
       {/* Modal Chỉnh Sửa */}
       {isEditModalOpen && categoryToEdit && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-lg w-1/3">
+          <div className="bg-white p-6 rounded-lg w-1/3 border border-gray-300">
             <h3 className="text-lg font-semibold">Edit Category</h3>
             <Input
               type="text"

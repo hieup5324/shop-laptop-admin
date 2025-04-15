@@ -1,7 +1,7 @@
-"use client"; // Mark this as a client-side component
+"use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // for routing
-import { Toaster } from "sonner"; // Toast for notifications
+import { useRouter } from "next/navigation";
+import { Toaster } from "sonner";
 import {
   FaHome,
   FaUsers,
@@ -9,7 +9,8 @@ import {
   FaCube,
   FaShoppingCart,
   FaMoneyBillAlt,
-} from "react-icons/fa"; // Import React Icons
+} from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
 
 export default function DashboardLayout({
   children,
@@ -23,6 +24,18 @@ export default function DashboardLayout({
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
+    } else {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        if (decodedToken.exp < currentTime) {
+          localStorage.removeItem("token");
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Token decoding error:", error);
+      }
     }
   }, [router]);
 

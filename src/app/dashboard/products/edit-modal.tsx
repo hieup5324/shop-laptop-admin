@@ -1,29 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface AddProductModalProps {
+interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onProductAdded: (category: any) => void;
+  onProductUpdated: () => void;
+  product: any;
 }
 
-const AddProductModal = ({
+const EditProductModal = ({
   isOpen,
   onClose,
-  onProductAdded,
-}: AddProductModalProps) => {
+  onProductUpdated,
+  product,
+}: EditProductModalProps) => {
   const [categories, setCategories] = useState<any[]>([]);
-  const [newProduct, setNewProduct] = useState({
+  const [editedProduct, setEditedProduct] = useState({
     product_name: "",
     price: 0,
     quantity: 0,
     description: "",
     photo_url: "",
-    categoryId: 0,
+    category_id: "",
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,9 +50,22 @@ const AddProductModal = ({
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    if (product) {
+      setEditedProduct({
+        product_name: product.product_name,
+        price: product.price,
+        quantity: product.quantity,
+        description: product.description || "",
+        photo_url: product.photo_url,
+        category_id: product.category_id,
+      });
+    }
+  }, [product]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewProduct((prev) => ({ ...prev, [name]: value }));
+    setEditedProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,20 +75,20 @@ const AddProductModal = ({
   };
 
   const handleCategoryChange = (value: string) => {
-    setNewProduct((prev) => ({ ...prev, categoryId: parseInt(value) }));
+    setEditedProduct((prev) => ({ ...prev, categoryId: value }));
   };
 
-  const handleAddProduct = async (e: React.FormEvent) => {
+  const handleUpdateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("product_name", newProduct.product_name);
-    formData.append("price", newProduct.price.toString());
-    formData.append("quantity", newProduct.quantity.toString());
-    formData.append("description", newProduct.description);
-    formData.append("categoryId", newProduct.categoryId.toString());
+    formData.append("product_name", editedProduct.product_name);
+    formData.append("price", editedProduct.price.toString());
+    formData.append("quantity", editedProduct.quantity.toString());
+    formData.append("description", editedProduct.description);
+    formData.append("categoryId", editedProduct.category_id);
 
     if (photoFile) {
       formData.append("photo_url", photoFile);
@@ -74,8 +96,8 @@ const AddProductModal = ({
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:3001/products",
+      await axios.patch(
+        `http://localhost:3001/products/${product.id}`,
         formData,
         {
           headers: {
@@ -84,22 +106,15 @@ const AddProductModal = ({
           },
         }
       );
-      onProductAdded(response.data);
+      onProductUpdated();
       onClose();
-      setNewProduct({
-        product_name: "",
-        price: 0,
-        quantity: 0,
-        description: "",
-        photo_url: "",
-        categoryId: 0,
-      });
       setPhotoFile(null);
       setLoading(false);
+      toast.success("Cập nhật sản phẩm thành công!");
     } catch (error) {
-      console.error("Error adding product", error);
+      console.error("Error updating product", error);
       setLoading(false);
-      toast.error("Failed to add product. Please try again.");
+      toast.error("Cập nhật sản phẩm thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -108,14 +123,19 @@ const AddProductModal = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
       <div className="bg-white p-8 rounded-lg w-1/3 border border-gray-300 shadow-lg relative">
-        <h3 className="text-xl font-semibold mb-6">Thêm sản phẩm mới</h3>
-        <form onSubmit={handleAddProduct} className="space-y-4">
+        <h3 className="text-xl font-semibold mb-6">Chỉnh sửa sản phẩm</h3>
+        <form onSubmit={handleUpdateProduct} className="space-y-4">
           <div>
-            <Label htmlFor="product_name" className="text-sm font-medium text-gray-700">Tên sản phẩm</Label>
+            <Label
+              htmlFor="product_name"
+              className="text-sm font-medium text-gray-700"
+            >
+              Tên sản phẩm
+            </Label>
             <Input
               id="product_name"
               name="product_name"
-              value={newProduct.product_name}
+              value={editedProduct.product_name}
               onChange={handleInputChange}
               className="mt-1"
               required
@@ -123,24 +143,34 @@ const AddProductModal = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price" className="text-sm font-medium text-gray-700">Giá</Label>
+              <Label
+                htmlFor="price"
+                className="text-sm font-medium text-gray-700"
+              >
+                Giá
+              </Label>
               <Input
                 id="price"
                 name="price"
                 type="number"
-                value={newProduct.price}
+                value={editedProduct.price}
                 onChange={handleInputChange}
                 className="mt-1"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="quantity" className="text-sm font-medium text-gray-700">Số lượng</Label>
+              <Label
+                htmlFor="quantity"
+                className="text-sm font-medium text-gray-700"
+              >
+                Số lượng
+              </Label>
               <Input
                 id="quantity"
                 name="quantity"
                 type="number"
-                value={newProduct.quantity}
+                value={editedProduct.quantity}
                 onChange={handleInputChange}
                 className="mt-1"
                 required
@@ -148,35 +178,50 @@ const AddProductModal = ({
             </div>
           </div>
           <div>
-            <Label htmlFor="description" className="text-sm font-medium text-gray-700">Mô tả</Label>
+            <Label
+              htmlFor="description"
+              className="text-sm font-medium text-gray-700"
+            >
+              Mô tả
+            </Label>
             <Input
               id="description"
               name="description"
-              value={newProduct.description}
+              value={editedProduct.description}
               onChange={handleInputChange}
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="categoryId" className="text-sm font-medium text-gray-700">Danh mục</Label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              value={newProduct.categoryId.toString()}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-              required
+            <Label
+              htmlFor="categoryId"
+              className="text-sm font-medium text-gray-700"
             >
-              <option value="">Chọn danh mục</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              Danh mục
+            </Label>
+            <Select
+              value={editedProduct.category_id}
+              onValueChange={handleCategoryChange}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Chọn danh mục" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
-            <Label htmlFor="photo_url" className="text-sm font-medium text-gray-700">Hình ảnh</Label>
+            <Label
+              htmlFor="photo_url"
+              className="text-sm font-medium text-gray-700"
+            >
+              Hình ảnh
+            </Label>
             <Input
               id="photo_url"
               name="photo_url"
@@ -185,9 +230,20 @@ const AddProductModal = ({
               onChange={handleFileChange}
               className="mt-1"
             />
+            {editedProduct.photo_url && !photoFile && (
+              <img
+                src={editedProduct.photo_url}
+                alt="Current product"
+                className="mt-2 w-20 h-20 object-cover rounded"
+              />
+            )}
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={onClose} className="border-gray-300">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="border-gray-300"
+            >
               Hủy
             </Button>
             <Button
@@ -195,7 +251,7 @@ const AddProductModal = ({
               className="bg-blue-500 text-white hover:bg-blue-600"
               disabled={loading}
             >
-              {loading ? "Đang thêm..." : "Thêm sản phẩm"}
+              {loading ? "Đang cập nhật..." : "Cập nhật"}
             </Button>
           </div>
         </form>
@@ -228,4 +284,4 @@ const AddProductModal = ({
   );
 };
 
-export default AddProductModal;
+export default EditProductModal;
