@@ -14,28 +14,44 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import ViewOrderModal from "./view-modal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const OrdersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3001/order/test", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            page: currentPage,
-            page_size: pageSize,
-            search: searchTerm,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:3001/order/test?is_admin=true",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              page: currentPage,
+              page_size: pageSize,
+              search: searchTerm,
+              payment_status:
+                paymentStatus !== "all" ? paymentStatus : undefined,
+            },
+          }
+        );
 
         setUsers(response.data.data);
         setTotalPages(response.data.paging.totalPages);
@@ -45,7 +61,7 @@ const OrdersPage = () => {
     };
 
     fetchUsers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, paymentStatus]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -53,10 +69,15 @@ const OrdersPage = () => {
     }
   };
 
+  const handleViewClick = (order: any) => {
+    setSelectedOrder(order);
+    setIsViewModalOpen(true);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="flex gap-4">
           <Input
             type="text"
             placeholder="Search for a user"
@@ -64,6 +85,20 @@ const OrdersPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium whitespace-nowrap">Trạng thái thanh toán:</span>
+            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Trạng thái thanh toán" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="pending">Chưa thanh toán</SelectItem>
+                <SelectItem value="success">Đã thanh toán</SelectItem>
+                <SelectItem value="failed">Thanh toán thất bại</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {/* <Button className="bg-blue-500 text-white py-2 px-4 rounded-lg">
           Add New
@@ -76,9 +111,9 @@ const OrdersPage = () => {
             <TableHead className="p-2">#</TableHead>
             <TableHead className="p-2">Created At</TableHead>
             <TableHead className="p-2">Order Code</TableHead>
+            <TableHead className="p-2">Partner Order Code</TableHead>
             <TableHead className="p-2">Payment Type</TableHead>
             <TableHead className="p-2">Status Payment</TableHead>
-            <TableHead className="p-2">Status</TableHead>
             <TableHead className="p-2">Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -93,11 +128,15 @@ const OrdersPage = () => {
                 {dayjs(user.createdAt).format("DD/MM/YYYY")}
               </TableCell>
               <TableCell className="p-2">{user.order_code}</TableCell>
+              <TableCell className="p-2">{user.order_code_transport}</TableCell>
               <TableCell className="p-2">{user.payment_type}</TableCell>
               <TableCell className="p-2">{user.status_payment}</TableCell>
-              <TableCell className="p-2">{user.status}</TableCell>
               <TableCell className="p-2">
-                <Button variant="outline" className="mr-2">
+                <Button
+                  variant="outline"
+                  className="mr-2"
+                  onClick={() => handleViewClick(user)}
+                >
                   View
                 </Button>
                 <Button variant="destructive">Delete</Button>
@@ -160,6 +199,12 @@ const OrdersPage = () => {
           Next
         </Button>
       </div>
+
+      <ViewOrderModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        order={selectedOrder}
+      />
     </div>
   );
 };

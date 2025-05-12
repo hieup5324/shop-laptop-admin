@@ -14,10 +14,19 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import { formatPriceVND } from "@/lib/format-price";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const UsersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [transStatus, setTransStatus] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
@@ -33,6 +42,7 @@ const UsersPage = () => {
             page: currentPage,
             page_size: pageSize,
             search: searchTerm,
+            trans_status: transStatus !== "all" ? transStatus : undefined,
           },
         });
 
@@ -44,7 +54,7 @@ const UsersPage = () => {
     };
 
     fetchUsers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, transStatus]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
@@ -55,7 +65,7 @@ const UsersPage = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="flex gap-4">
           <Input
             type="text"
             placeholder="Search transactions..."
@@ -63,6 +73,19 @@ const UsersPage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium whitespace-nowrap">Trạng thái giao dịch:</span>
+            <Select value={transStatus} onValueChange={setTransStatus}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Trạng thái giao dịch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="success">Giao dịch thành công</SelectItem>
+                <SelectItem value="failed">Giao dịch thất bại</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -92,7 +115,9 @@ const UsersPage = () => {
               <TableCell className="p-2">{user.bank_code}</TableCell>
               <TableCell className="p-2">{user.bank_tran_no}</TableCell>
               <TableCell className="p-2">{user.card_type}</TableCell>
-              <TableCell className="p-2">{user.amount}</TableCell>
+              <TableCell className="p-2">{`${formatPriceVND(
+                user.amount
+              )} VNĐ`}</TableCell>
               <TableCell className="p-2">{user.transaction_status}</TableCell>
               <TableCell className="p-2">
                 <Button variant="outline" className="mr-2">
@@ -130,7 +155,9 @@ const UsersPage = () => {
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
-                      className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                      className={`w-10 h-10 ${
+                        currentPage === page ? "" : "border-black"
+                      }`}
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
@@ -142,7 +169,9 @@ const UsersPage = () => {
                 <Button
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
-                  className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                  className={`w-10 h-10 ${
+                    currentPage === page ? "" : "border-black"
+                  }`}
                   onClick={() => handlePageChange(page)}
                 >
                   {page}

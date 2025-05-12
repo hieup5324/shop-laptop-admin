@@ -9,6 +9,8 @@ import {
   FaCube,
   FaShoppingCart,
   FaMoneyBillAlt,
+  FaChartBar,
+  FaHeadset,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
@@ -113,6 +115,28 @@ export default function DashboardLayout({
             >
               <FaMoneyBillAlt className="w-5 h-5" />
               <span>Transactions</span>
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleNavigation("chat")}
+              className={`w-full text-left px-6 py-2 hover:bg-gray-700 text-white font-bold flex items-center space-x-3 ${
+                activeTab === "chat" ? "bg-gray-700" : ""
+              }`}
+            >
+              <FaHeadset className="w-5 h-5" />
+              <span>Support</span>
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleNavigation("statistics")}
+              className={`w-full text-left px-6 py-2 hover:bg-gray-700 text-white font-bold flex items-center space-x-3 ${
+                activeTab === "statistics" ? "bg-gray-700" : ""
+              }`}
+            >
+              <FaChartBar className="w-5 h-5" />
+              <span>Statistics</span>
             </button>
           </li>
         </ul>
