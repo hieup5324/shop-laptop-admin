@@ -2,12 +2,43 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Overview } from "@/components/statistics/overview";
-import { RecentSales } from "@/components/statistics/recent-sales";
+import { useEffect, useState } from "react";
+
+interface StatisticsData {
+  totalRevenue: number;
+  totalOrdersCompleted: number;
+}
 
 export default function StatisticsPage() {
+  const [statistics, setStatistics] = useState<StatisticsData>({
+    totalRevenue: 0,
+    totalOrdersCompleted: 0,
+  });
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/statistics");
+        const data = await response.json();
+        setStatistics(data);
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -15,68 +46,32 @@ export default function StatisticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45,231,000đ</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% so với tháng trước
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Đơn hàng</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">
-              +180.1% so với tháng trước
-            </p>
+            <div className="text-2xl font-bold">
+              {formatCurrency(statistics.totalRevenue)}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Người dùng mới
+              Đơn hàng đã hoàn thành
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">
-              +201 so với tháng trước
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Sản phẩm bán chạy
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12</div>
-            <p className="text-xs text-muted-foreground">
-              +19% so với tháng trước
-            </p>
+            <div className="text-2xl font-bold">
+              {statistics.totalOrdersCompleted}
+            </div>
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Doanh thu theo thời gian</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <Overview />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Đơn hàng gần đây</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RecentSales />
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Doanh thu theo thời gian</CardTitle>
+        </CardHeader>
+        <CardContent className="pl-2">
+          <Overview />
+        </CardContent>
+      </Card>
     </div>
   );
 }
