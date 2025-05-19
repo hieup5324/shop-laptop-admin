@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatPriceVND } from "@/lib/format-price";
 
 const OrdersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -86,7 +87,9 @@ const OrdersPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium whitespace-nowrap">Trạng thái thanh toán:</span>
+            <span className="text-sm font-medium whitespace-nowrap">
+              Trạng thái thanh toán:
+            </span>
             <Select value={paymentStatus} onValueChange={setPaymentStatus}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Trạng thái thanh toán" />
@@ -112,6 +115,7 @@ const OrdersPage = () => {
             <TableHead className="p-2">Created At</TableHead>
             <TableHead className="p-2">Order Code</TableHead>
             <TableHead className="p-2">Partner Order Code</TableHead>
+            <TableHead className="p-2">Total Price</TableHead>
             <TableHead className="p-2">Payment Type</TableHead>
             <TableHead className="p-2">Status Payment</TableHead>
             <TableHead className="p-2">Action</TableHead>
@@ -129,17 +133,28 @@ const OrdersPage = () => {
               </TableCell>
               <TableCell className="p-2">{user.order_code}</TableCell>
               <TableCell className="p-2">{user.order_code_transport}</TableCell>
+              <TableCell className="p-2">
+                {formatPriceVND(user.total_price)} VNĐ
+              </TableCell>
               <TableCell className="p-2">{user.payment_type}</TableCell>
               <TableCell className="p-2">{user.status_payment}</TableCell>
               <TableCell className="p-2">
-                <Button
-                  variant="outline"
-                  className="mr-2"
-                  onClick={() => handleViewClick(user)}
-                >
-                  View
-                </Button>
-                <Button variant="destructive">Delete</Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleViewClick(user)}
+                  >
+                    View Order
+                  </Button>
+                  {user.transaction_id && (
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.href = `/dashboard/transactions?transaction_id=${user.transaction_id}`}
+                    >
+                      View Transaction
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

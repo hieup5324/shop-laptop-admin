@@ -27,6 +27,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPriceVND } from "@/lib/format-price";
+import {
+  Dialog as ShadcnDialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const ProductPage = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -40,6 +48,8 @@ const ProductPage = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<any>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -106,6 +116,31 @@ const ProductPage = () => {
     fetchProducts();
     toast.success("Cập nhật sản phẩm thành công!");
   };
+
+  const handleDeleteClick = (product: any) => {
+    setProductToDelete(product);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/products/${productToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      
+      toast.success("Xóa sản phẩm thành công!");
+      setIsDeleteModalOpen(false);
+      setProductToDelete(null);
+      // Refresh the list
+      fetchProducts();
+    } catch (error) {
+      console.error("Error deleting product", error);
+      toast.error("Có lỗi xảy ra khi xóa sản phẩm!");
+    }
+  };
+
   console.log(products);
   return (
     <div>
@@ -203,7 +238,12 @@ const ProductPage = () => {
                 >
                   Edit
                 </Button>
-                <Button variant="destructive">Xóa</Button>
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleDeleteClick(product)}
+                >
+                  Xóa
+                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -280,6 +320,32 @@ const ProductPage = () => {
         onProductUpdated={handleProductUpdated}
         product={selectedProduct}
       />
+
+      {/* Delete Confirmation Modal */}
+      <ShadcnDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa sản phẩm "{productToDelete?.product_name}" không? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </ShadcnDialog>
     </div>
   );
 };

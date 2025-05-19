@@ -90,86 +90,75 @@ const ViewOrderModal = ({ isOpen, onClose, order }: ViewOrderModalProps) => {
         <h3 className="text-xl font-semibold mb-6">Chi tiết đơn hàng</h3>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Mã đơn hàng
-              </Label>
-              <p className="mt-1">{order.order_code}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Ngày tạo
-              </Label>
-              <p className="mt-1">
-                {dayjs(order.createdAt).format("DD/MM/YYYY HH:mm")}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Phương thức thanh toán
-              </Label>
-              <p className="mt-1">{order.payment_type}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Trạng thái thanh toán
-              </Label>
-              <p className="mt-1">
-                {convertPaymentStatus(order.status_payment)}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Trạng thái đơn hàng
-              </Label>
-              <p className="mt-1">
-                {loading ? (
-                  <span className="text-gray-500">Đang tải...</span>
-                ) : ghnStatus ? (
-                  convertGhnStatus(ghnStatus)
-                ) : (
-                  order.status
-                )}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-700">
-                Mã vận chuyển
-              </Label>
-              <p className="mt-1">{order.order_code_transport || "Chưa có"}</p>
+          {/* Thông tin người nhận */}
+          <div className="mt-6">
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              Thông tin người nhận
+            </Label>
+            <div className="border rounded-lg p-4 space-y-2">
+              <div>
+                <span className="font-medium">Tên người nhận: </span>
+                {order.receiver_name}
+              </div>
+              <div>
+                <span className="font-medium">Số điện thoại: </span>
+                {order.receiver_phone}
+              </div>
+              <div>
+                <span className="font-medium">Địa chỉ: </span>
+                {order.receiver_address}
+              </div>
             </div>
           </div>
 
-          {order.order_items && order.order_items.length > 0 && (
+          {/* Chi tiết sản phẩm */}
+          {order.orderItems && order.orderItems.length > 0 && (
             <div className="mt-4">
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
                 Chi tiết sản phẩm
               </Label>
               <div className="border rounded-lg p-4 space-y-4">
-                {order.order_items.map((item: any, index: number) => (
+                {order.orderItems.map((item: any, index: number) => (
                   <div key={index} className="flex items-center gap-4">
                     <img
-                      src={item.product?.photo_url}
-                      alt={item.product?.product_name}
-                      className="w-16 h-16 object-cover rounded"
+                      src={item.photo_url}
+                      alt={item.product_name}
+                      className="w-24 h-24 object-cover rounded"
                     />
-                    <div>
-                      <p className="font-medium">
-                        {item.product?.product_name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Số lượng: {item.quantity}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Giá: {item.price} VNĐ
-                      </p>
+                    <div className="flex-1">
+                      <p className="font-medium text-lg">{item.product_name}</p>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <p className="text-sm text-gray-600">
+                          Số lượng: {item.quantity}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Đơn giá: {item.price.toLocaleString("vi-VN")} VNĐ
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Thành tiền: {item.total_price.toLocaleString("vi-VN")}{" "}
+                          VNĐ
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Tổng tiền */}
+          <div className="mt-4 border-t pt-4">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">Phí vận chuyển:</span>
+              <span>{order.fee_transport?.toLocaleString("vi-VN")} VNĐ</span>
+            </div>
+            <div className="flex justify-between items-center mt-2">
+              <span className="font-medium text-lg">Tổng tiền:</span>
+              <span className="text-lg font-bold">
+                {order.total_price.toLocaleString("vi-VN")} VNĐ
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 mt-6">

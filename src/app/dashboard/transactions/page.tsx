@@ -22,6 +22,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const UsersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -30,35 +39,68 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(6);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<any>(null);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/vnpay", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          page: currentPage,
+          page_size: pageSize,
+          search: searchTerm,
+          trans_status: transStatus !== "all" ? transStatus : undefined,
+        },
+      });
+
+      setUsers(response.data.data);
+      setTotalPages(response.data.paging.totalPages);
+    } catch (error) {
+      console.error("Error fetching users", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/vnpay", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          params: {
-            page: currentPage,
-            page_size: pageSize,
-            search: searchTerm,
-            trans_status: transStatus !== "all" ? transStatus : undefined,
-          },
-        });
-
-        setUsers(response.data.data);
-        setTotalPages(response.data.paging.totalPages);
-      } catch (error) {
-        console.error("Error fetching users", error);
-      }
-    };
-
     fetchUsers();
   }, [currentPage, pageSize, searchTerm, transStatus]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
+    }
+  };
+
+  const handleViewClick = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setIsViewModalOpen(true);
+  };
+
+  const handleDeleteClick = (transaction: any) => {
+    setTransactionToDelete(transaction);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/vnpay/${transactionToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      
+      toast.success("Xóa giao dịch thành công!");
+      setIsDeleteModalOpen(false);
+      setTransactionToDelete(null);
+      // Refresh the list
+      fetchUsers();
+    } catch (error) {
+      console.error("Error deleting transaction", error);
+      toast.error("Có lỗi xảy ra khi xóa giao dịch!");
     }
   };
 
@@ -120,15 +162,90 @@ const UsersPage = () => {
               )} VNĐ`}</TableCell>
               <TableCell className="p-2">{user.transaction_status}</TableCell>
               <TableCell className="p-2">
-                <Button variant="outline" className="mr-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleViewClick(user)}
+                >
                   View
                 </Button>
-                <Button variant="destructive">Delete</Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Transaction View Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Transaction Details</DialogTitle>
+          </DialogHeader>
+          {selectedTransaction && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Created At:</span>
+                <span className="col-span-3">
+                  {dayjs(selectedTransaction.createdAt).format("DD/MM/YYYY HH:mm")}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Bank:</span>
+                <span className="col-span-3">{selectedTransaction.bank_code}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Bank Transaction:</span>
+                <span className="col-span-3">{selectedTransaction.bank_tran_no}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Card Type:</span>
+                <span className="col-span-3">{selectedTransaction.card_type}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Amount:</span>
+                <span className="col-span-3">
+                  {formatPriceVND(selectedTransaction.amount)} VNĐ
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="font-medium">Status:</span>
+                <span className="col-span-3">{selectedTransaction.transaction_status}</span>
+              </div>
+              {selectedTransaction.order_code && (
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="font-medium">Order Code:</span>
+                  <span className="col-span-3">{selectedTransaction.order_code}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa giao dịch này không? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
