@@ -145,7 +145,7 @@ const UsersPage = () => {
             <TableHead className="p-2">Ngân hàng</TableHead>
             <TableHead className="p-2">Mã giao dịch</TableHead>
             <TableHead className="p-2">Loại thẻ</TableHead>
-            <TableHead className="p-2">Giá trị</TableHead>
+            <TableHead className="p-2">Tổng tiền</TableHead>
             <TableHead className="p-2">Trạng thái giao dịch</TableHead>
             <TableHead className="p-2">Hành động</TableHead>
           </TableRow>
@@ -160,9 +160,15 @@ const UsersPage = () => {
               <TableCell className="p-2">
                 {dayjs(user.createdAt).format("DD/MM/YYYY")}
               </TableCell>
-              <TableCell className="p-2">{user.bank_code}</TableCell>
-              <TableCell className="p-2">{user.bank_tran_no}</TableCell>
-              <TableCell className="p-2">{user.card_type}</TableCell>
+              <TableCell className="p-2">
+                {user.bank_code ? user.bank_code : "---"}
+              </TableCell>
+              <TableCell className="p-2">
+                {user.bank_tran_no ? user.bank_tran_no : "---"}
+              </TableCell>
+              <TableCell className="p-2">
+                {user.card_type ? user.card_type : "---"}
+              </TableCell>
               <TableCell className="p-2">{`${formatPriceVND(
                 user.amount
               )} VNĐ`}</TableCell>
@@ -197,20 +203,30 @@ const UsersPage = () => {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Ngân hàng:</span>
-                <span className="">{selectedTransaction.bank_code}</span>
+                <span className="">
+                  {selectedTransaction.bank_code
+                    ? selectedTransaction.bank_code
+                    : "---"}
+                </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Mã giao dịch:</span>
-                <span className="">{selectedTransaction.bank_tran_no}</span>
+                <span className="">
+                  {selectedTransaction.bank_tran_no
+                    ? selectedTransaction.bank_tran_no
+                    : "---"}
+                </span>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <span className="font-medium">Loại thẻ:</span>
                 <span className="col-span-3">
-                  {selectedTransaction.card_type}
+                  {selectedTransaction.card_type
+                    ? selectedTransaction.card_type
+                    : "---"}
                 </span>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <span className="font-medium">Giá trị:</span>
+                <span className="font-medium">Tổng tiền:</span>
                 <span className="col-span-3">
                   {formatPriceVND(selectedTransaction.amount)} VNĐ
                 </span>

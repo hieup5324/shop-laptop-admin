@@ -133,7 +133,9 @@ const OrdersPage = () => {
                 {dayjs(user.createdAt).format("DD/MM/YYYY")}
               </TableCell>
               <TableCell className="p-2">{user.order_code}</TableCell>
-              <TableCell className="p-2">{user.order_code_transport}</TableCell>
+              <TableCell className="p-2">
+                {user.order_code_transport ? user.order_code_transport : "---"}
+              </TableCell>
               <TableCell className="p-2">
                 {formatPriceVND(user.total_price)} VNĐ
               </TableCell>
