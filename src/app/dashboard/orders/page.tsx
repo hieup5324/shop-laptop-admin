@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPriceVND } from "@/lib/format-price";
+import { convertPaymentStatus } from "@/lib/utils";
 
 const OrdersPage = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -81,7 +82,7 @@ const OrdersPage = () => {
         <div className="flex gap-4">
           <Input
             type="text"
-            placeholder="Search for a user"
+            placeholder="Tìm kiếm đơn hàng"
             className="p-2 border rounded-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,13 +113,13 @@ const OrdersPage = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="p-2">#</TableHead>
-            <TableHead className="p-2">Created At</TableHead>
-            <TableHead className="p-2">Order Code</TableHead>
-            <TableHead className="p-2">Partner Order Code</TableHead>
-            <TableHead className="p-2">Total Price</TableHead>
-            <TableHead className="p-2">Payment Type</TableHead>
-            <TableHead className="p-2">Status Payment</TableHead>
-            <TableHead className="p-2">Action</TableHead>
+            <TableHead className="p-2">Ngày tạo</TableHead>
+            <TableHead className="p-2">Mã đơn hàng</TableHead>
+            <TableHead className="p-2">Mã đơn vị vận chuyển</TableHead>
+            <TableHead className="p-2">Giá trị đơn hàng</TableHead>
+            <TableHead className="p-2">Phương thức thanh toán</TableHead>
+            <TableHead className="p-2">Trạng thái thanh toán</TableHead>
+            <TableHead className="p-2">Hàng động</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -137,19 +138,23 @@ const OrdersPage = () => {
                 {formatPriceVND(user.total_price)} VNĐ
               </TableCell>
               <TableCell className="p-2">{user.payment_type}</TableCell>
-              <TableCell className="p-2">{user.status_payment}</TableCell>
+              <TableCell className="p-2">
+                {convertPaymentStatus(user.status_payment)}
+              </TableCell>
               <TableCell className="p-2">
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     onClick={() => handleViewClick(user)}
                   >
-                    View Order
+                    Xem đơn hàng
                   </Button>
                   {user.transaction_id && (
                     <Button
                       variant="outline"
-                      onClick={() => window.location.href = `/dashboard/transactions?transaction_id=${user.transaction_id}`}
+                      onClick={() =>
+                        (window.location.href = `/dashboard/transactions?transaction_id=${user.transaction_id}`)
+                      }
                     >
                       View Transaction
                     </Button>

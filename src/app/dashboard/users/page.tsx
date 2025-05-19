@@ -89,11 +89,11 @@ const UsersPage = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="p-2">#</TableHead>
-            <TableHead className="p-2">Name</TableHead>
+            <TableHead className="p-2">Họ và tên</TableHead>
             <TableHead className="p-2">Email</TableHead>
-            <TableHead className="p-2">Created At</TableHead>
-            <TableHead className="p-2">Role</TableHead>
-            <TableHead className="p-2">Action</TableHead>
+            <TableHead className="p-2">Ngày tạo</TableHead>
+            <TableHead className="p-2">Chức vụ</TableHead>
+            <TableHead className="p-2">Hành động</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -116,7 +116,7 @@ const UsersPage = () => {
                   variant="destructive"
                   onClick={() => handleDeleteUser(user.id)}
                 >
-                  Delete
+                  Xóa
                 </Button>
               </TableCell>
             </TableRow>

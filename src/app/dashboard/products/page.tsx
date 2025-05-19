@@ -124,12 +124,15 @@ const ProductPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3001/products/${productToDelete.id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      
+      await axios.delete(
+        `http://localhost:3001/products/${productToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
       toast.success("Xóa sản phẩm thành công!");
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
@@ -198,12 +201,12 @@ const ProductPage = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="p-2">#</TableHead>
-            <TableHead className="p-2">Product Image</TableHead>
-            <TableHead className="p-2">Product Name</TableHead>
-            <TableHead className="p-2">Price</TableHead>
-            <TableHead className="p-2">Discount Price</TableHead>
-            <TableHead className="p-2">Stock</TableHead>
-            <TableHead className="p-2">Action</TableHead>
+            <TableHead className="p-2">Ảnh sản phẩm</TableHead>
+            <TableHead className="p-2">Tên sản phẩm</TableHead>
+            <TableHead className="p-2">Giá</TableHead>
+            <TableHead className="p-2">Giảm giá</TableHead>
+            <TableHead className="p-2">Kho</TableHead>
+            <TableHead className="p-2">Hành động</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -236,9 +239,9 @@ const ProductPage = () => {
                   className="mr-2"
                   onClick={() => handleEditClick(product)}
                 >
-                  Edit
+                  Sửa
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => handleDeleteClick(product)}
                 >
@@ -322,12 +325,17 @@ const ProductPage = () => {
       />
 
       {/* Delete Confirmation Modal */}
-      <ShadcnDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+      <ShadcnDialog
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa</DialogTitle>
             <DialogDescription>
-              Bạn có chắc chắn muốn xóa sản phẩm "{productToDelete?.product_name}" không? Hành động này không thể hoàn tác.
+              Bạn có chắc chắn muốn xóa sản phẩm "
+              {productToDelete?.product_name}" không? Hành động này không thể
+              hoàn tác.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 justify-end mt-4">
@@ -337,10 +345,7 @@ const ProductPage = () => {
             >
               Hủy
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-            >
+            <Button variant="destructive" onClick={handleConfirmDelete}>
               Xóa
             </Button>
           </DialogFooter>

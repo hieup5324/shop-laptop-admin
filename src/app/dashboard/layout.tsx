@@ -56,8 +56,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex">
-      <div className="w-64 bg-gray-800 min-h-screen p-6">
-        <div className="text-2xl font-bold text-white mb-6">Admin Panel</div>
+      <div className="w-70 bg-gray-800 min-h-screen p-6">
+        <div className="text-2xl font-bold text-white mb-6">Quản trị viên</div>
         <ul>
           <li>
             <button
@@ -67,7 +67,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaHome className="w-5 h-5" />
-              <span>Dashboard</span>
+              <span>Trang chủ</span>
             </button>
           </li>
           <li>
@@ -78,7 +78,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaUsers className="w-5 h-5" />
-              <span>Users</span>
+              <span>Người dùng</span>
             </button>
           </li>
           <li>
@@ -89,7 +89,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaTag className="w-5 h-5" />
-              <span>Product Categories</span>
+              <span>Danh mục</span>
             </button>
           </li>
           <li>
@@ -100,7 +100,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaCube className="w-5 h-5" />
-              <span>Products</span>
+              <span>Sản phẩm</span>
             </button>
           </li>
           <li>
@@ -111,7 +111,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaShoppingCart className="w-5 h-5" />
-              <span>Orders</span>
+              <span>Lịch sử đơn hàng</span>
             </button>
           </li>
           <li>
@@ -122,7 +122,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaMoneyBillAlt className="w-5 h-5" />
-              <span>Transactions</span>
+              <span>Lịch sử giao dịch</span>
             </button>
           </li>
           <li>
@@ -133,7 +133,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaHeadset className="w-5 h-5" />
-              <span>Support</span>
+              <span>Hỗ trợ khách hàng</span>
             </button>
           </li>
           <li>
@@ -144,7 +144,7 @@ export default function DashboardLayout({
               }`}
             >
               <FaChartBar className="w-5 h-5" />
-              <span>Statistics</span>
+              <span>Thống kê</span>
             </button>
           </li>
           <li className="mt-auto">
@@ -156,7 +156,7 @@ export default function DashboardLayout({
               className="w-full text-left px-6 py-2 hover:bg-gray-700 text-white font-bold flex items-center space-x-3"
             >
               <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <span>Đăng xuất</span>
             </button>
           </li>
         </ul>

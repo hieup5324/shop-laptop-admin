@@ -154,7 +154,7 @@ const CategoriesPage = () => {
         <div>
           <input
             type="text"
-            placeholder="Search for a category"
+            placeholder="Tìm kiếm danh mục"
             className="p-2 border rounded-lg"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -164,7 +164,7 @@ const CategoriesPage = () => {
           className="bg-blue-500 text-white py-2 px-4 rounded-lg"
           onClick={() => setIsModalOpen(true)}
         >
-          Add New Category
+          Thêm
         </Button>
       </div>
 
@@ -172,9 +172,9 @@ const CategoriesPage = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="p-2">#</TableHead>
-            <TableHead className="p-2">Category Name</TableHead>
-            <TableHead className="p-2">Description</TableHead>
-            <TableHead className="p-2">Action</TableHead>
+            <TableHead className="p-2">Tên danh mục</TableHead>
+            <TableHead className="p-2">Mô tả</TableHead>
+            <TableHead className="p-2">Hành động</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -194,13 +194,13 @@ const CategoriesPage = () => {
                   className="mr-2"
                   onClick={() => openEditModal(category)}
                 >
-                  Edit
+                  Sửa
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => openConfirmModal(category.id)}
                 >
-                  Delete
+                  Xóa
                 </Button>
               </TableCell>
             </TableRow>
@@ -232,7 +232,9 @@ const CategoriesPage = () => {
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
-                      className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                      className={`w-10 h-10 ${
+                        currentPage === page ? "" : "border-black"
+                      }`}
                       onClick={() => handlePageChange(page)}
                     >
                       {page}
@@ -244,7 +246,9 @@ const CategoriesPage = () => {
                 <Button
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
-                  className={`w-10 h-10 ${currentPage === page ? "" : "border-black"}`}
+                  className={`w-10 h-10 ${
+                    currentPage === page ? "" : "border-black"
+                  }`}
                   onClick={() => handlePageChange(page)}
                 >
                   {page}
@@ -288,7 +292,7 @@ const CategoriesPage = () => {
       {isEditModalOpen && categoryToEdit && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg w-1/3 border border-gray-300">
-            <h3 className="text-lg font-semibold">Edit Category</h3>
+            <h3 className="text-lg font-semibold">Sửa danh mục</h3>
             <Input
               type="text"
               className="p-2 border rounded-lg w-full mb-4"
@@ -313,13 +317,13 @@ const CategoriesPage = () => {
                 onClick={() => setIsEditModalOpen(false)}
                 className="mr-2"
               >
-                Cancel
+                Hủy
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => handleUpdateCategory(categoryToEdit)}
               >
-                Save
+                Lưu
               </Button>
             </div>
           </div>
