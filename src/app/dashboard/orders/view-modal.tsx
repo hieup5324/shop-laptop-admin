@@ -90,6 +90,57 @@ const ViewOrderModal = ({ isOpen, onClose, order }: ViewOrderModalProps) => {
         <h3 className="text-xl font-semibold mb-6">Chi tiết đơn hàng</h3>
 
         <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Mã đơn hàng
+              </Label>
+              <p className="mt-1">{order.order_code}</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Ngày tạo
+              </Label>
+              <p className="mt-1">
+                {dayjs(order.createdAt).format("DD/MM/YYYY HH:mm")}
+              </p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Phương thức thanh toán
+              </Label>
+              <p className="mt-1">{order.payment_type}</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Trạng thái thanh toán
+              </Label>
+              <p className="mt-1">
+                {convertPaymentStatus(order.status_payment)}
+              </p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Trạng thái đơn hàng
+              </Label>
+              <p className="mt-1">
+                {loading ? (
+                  <span className="text-gray-500">Đang tải...</span>
+                ) : ghnStatus ? (
+                  convertGhnStatus(ghnStatus)
+                ) : (
+                  order.status
+                )}
+              </p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">
+                Mã vận chuyển
+              </Label>
+              <p className="mt-1">{order.order_code_transport || "Chưa có"}</p>
+            </div>
+          </div>
+
           {/* Thông tin người nhận */}
           <div className="mt-6">
             <Label className="text-sm font-medium text-gray-700 mb-2 block">
